@@ -1,0 +1,23 @@
+{
+  "name": "fablicate",
+  "description": "Fable-5-style persistence for Claude Code: a Stop-hook guard that blocks premature stops on unfinished work, plus the /fablicate single-turn marathon-mode skill.",
+  "version": "0.1.0",
+  "author": {
+    "name": "koala-penguin",
+    "url": "https://github.com/koala-penguin"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/persistence-guard.py\"",
+            "timeout": 15,
+            "statusMessage": "Persistence guard: checking for unfinished work..."
+          }
+        ]
+      }
+    ]
+  }
+}

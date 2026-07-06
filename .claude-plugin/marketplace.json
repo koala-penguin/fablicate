@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "fablicate",
+  "description": "Fable-5-style persistence for Claude Code — work longer, ask less, finish the task.",
+  "owner": {
+    "name": "koala-penguin",
+    "url": "https://github.com/koala-penguin"
+  },
+  "plugins": [
+    {
+      "name": "fablicate",
+      "description": "Persistence guard Stop hook + /fablicate marathon-mode skill. Makes any model work in long autonomous stretches instead of stopping to ask.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

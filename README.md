@@ -16,20 +16,31 @@ Layer 1 sets the default behavior, layer 2 is the mechanical backstop when the m
 
 ## Install
 
-### 1. Autonomy block
-Copy the block from [docs/autonomy-block.md](docs/autonomy-block.md) to the top of `~/.claude/CLAUDE.md`.
+### Option A — as a Claude Code plugin (recommended, 2 commands)
 
-### 2. Persistence guard hook
-```bash
-cp hooks/persistence-guard.py ~/.claude/hooks/
+Inside Claude Code:
 ```
-Then merge the entry from [settings/stop-hook.json](settings/stop-hook.json) into the `hooks.Stop` array of `~/.claude/settings.json` (append — don't replace your existing Stop hooks). Takes effect on the next session.
+/plugin marketplace add koala-penguin/fablicate
+/plugin install fablicate@fablicate
+```
+This registers the Stop hook and the skill automatically (skill becomes `/fablicate:fablicate`). Then paste the [autonomy block](docs/autonomy-block.md) into `~/.claude/CLAUDE.md` — plugins can't ship always-on instructions, so that one step stays manual.
 
-### 3. Skill
+### Option B — manual install script
+
 ```bash
-cp -r skills/fablicate ~/.claude/skills/
+git clone https://github.com/koala-penguin/fablicate.git
+cd fablicate && ./install.sh
 ```
-Invoke with `/fablicate <task>`. Turn off with `fablicate off`.
+Idempotent: copies the hook + skill, appends the Stop-hook entry to `~/.claude/settings.json` (never clobbers existing hooks), and appends the autonomy block to `~/.claude/CLAUDE.md` if missing. Takes effect on the next session.
+
+### For AI agents installing this
+
+If you are a coding agent setting this up for your user, prefer Option B non-interactively:
+1. `git clone https://github.com/koala-penguin/fablicate.git /tmp/fablicate && /tmp/fablicate/install.sh`
+2. Verify: `jq '.hooks.Stop' ~/.claude/settings.json` shows a `persistence-guard.py` entry; `~/.claude/skills/fablicate/SKILL.md` exists; `~/.claude/CLAUDE.md` contains "Autonomy & persistence".
+3. Tell your user it takes effect on the next session, and that `CLAUDE_PERSIST=0` disables the guard for any headless/scheduled jobs they run — check whether they have such jobs and gate them.
+
+Invoke marathon mode with `/fablicate <task>`. Turn off with `fablicate off`.
 
 ## How the guard decides
 
