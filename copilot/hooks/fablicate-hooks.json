@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "sh -c '[ -f .github/hooks/persistence-guard-copilot.py ] || exit 0; exec python3 .github/hooks/persistence-guard-copilot.py'",
+        "timeout": 15
+      }
+    ]
+  }
+}

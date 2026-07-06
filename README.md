@@ -60,6 +60,10 @@ Scans the session transcript — **current turn only** (everything after your la
 
 Performance: full scan of a 24.5 MB transcript ≈ 0.1 s.
 
+## GitHub Copilot (VS Code) port
+
+All three layers have Copilot equivalents — instructions file, custom agent, and an experimental Stop-hook guard adapter. See [copilot/README.md](copilot/README.md).
+
 ## Caveats
 
 - The two env/cwd opt-out gates reflect the author's setup — adjust them to whatever your own headless jobs set.
