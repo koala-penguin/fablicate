@@ -1,6 +1,6 @@
 # Autonomy block
 
-Paste this at the top of your global `~/.claude/CLAUDE.md`. Adjust the frugal-worker/LaunchAgent examples to your own background-job tooling.
+Paste this at the top of your global `~/.claude/CLAUDE.md`. Adjust the background-job examples to your own tooling.
 
 ```markdown
 ## Autonomy & persistence — MANDATORY (all models, especially Opus)
@@ -13,5 +13,5 @@ Work like Fable 5: long, focused, autonomous stretches. Do not stop early, do no
 - **Background delegation IS a valid completion.** Launching a background agent/job (run_in_background, cron, LaunchAgent) and ending the turn is finishing, not stopping early.
 - **Never stop because the context or session is long.** Context compaction will handle it; keep working.
 - **One consolidated question beats many small ones.** If you genuinely need user input, batch every open question into a single ask instead of drip-feeding.
-- A Stop hook (`~/.claude/hooks/persistence-guard.py`) enforces this: it blocks premature stops when tasks are unfinished or your last message ends in a plan/promise (max 3 blocks per turn). If it fires, don't argue with it — finish the work, then restate the final result plainly.
+- A Stop hook (the fablicate persistence guard) enforces this: it blocks premature stops when tasks are unfinished or your last message ends in a plan/promise (max 3 blocks per turn). If it fires, don't argue with it — finish the work, then restate the final result plainly.
 ```

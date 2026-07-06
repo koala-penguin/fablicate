@@ -106,16 +106,36 @@ def prune_state():
         pass
 
 
+# Harness-injected user entries that are NOT genuine user prompts. Critically,
+# this guard's own block feedback must never count as a turn boundary — that
+# would reset the counter every block and defeat the cap entirely.
+INJECTED_PREFIXES = ("<task-notification>", "<system-reminder>", "<local-command")
+INJECTED_MARKERS = ("PERSISTENCE GUARD:", "Stop hook feedback")
+
+
 def is_real_user_message(d):
-    """A genuine user prompt (turn boundary) — not a tool_result carrier."""
+    """A genuine user prompt (turn boundary) — not a tool_result carrier and
+    not harness-injected feedback (stop-hook blocks, task notifications)."""
     if d.get("type") != "user" or d.get("isSidechain") or d.get("isMeta"):
         return False
     content = (d.get("message") or {}).get("content")
     if isinstance(content, str):
-        return bool(content.strip())
-    if isinstance(content, list):
-        return any(b.get("type") == "text" for b in content if isinstance(b, dict))
-    return False
+        text = content
+    elif isinstance(content, list):
+        text = "\n".join(
+            b.get("text", "") for b in content
+            if isinstance(b, dict) and b.get("type") == "text"
+        )
+    else:
+        return False
+    text = text.strip()
+    if not text:
+        return False
+    if text.startswith(INJECTED_PREFIXES):
+        return False
+    if any(m in text for m in INJECTED_MARKERS):
+        return False
+    return True
 
 
 def scan_transcript(path):
@@ -149,23 +169,26 @@ def scan_transcript(path):
             if not isinstance(content, list):
                 continue
             texts = []
-            saw_tool_after = False
+            has_tool_use = False
             for block in content:
                 if not isinstance(block, dict):
                     continue
                 btype = block.get("type")
                 if btype == "text":
                     texts.append(block.get("text", ""))
-                    saw_tool_after = False
                 elif btype == "tool_use":
-                    if texts:
-                        saw_tool_after = True
+                    has_tool_use = True
                     inp = block.get("input") or {}
                     if block.get("name") == "TodoWrite" and isinstance(inp.get("todos"), list):
                         todos = inp["todos"]
+            # Real transcripts split text and tool_use into separate JSONL
+            # entries, so "a tool call followed the text" must be tracked
+            # across entries, not within one.
             if texts:
                 last_text = "\n".join(texts)
-                tool_after_text = saw_tool_after
+                tool_after_text = has_tool_use
+            elif has_tool_use and last_text:
+                tool_after_text = True
 
     incomplete = [
         (t.get("content") or t.get("subject") or "todo")
@@ -184,7 +207,8 @@ def main():
     if os.environ.get("CLAUDE_PERSIST") == "0":
         return
     cwd = data.get("cwd") or ""
-    if cwd.startswith(os.path.expanduser("~/jobs")):
+    jobs_root = os.path.expanduser("~/jobs")
+    if cwd == jobs_root or cwd.startswith(jobs_root + os.sep):
         return
 
     session_id = data.get("session_id") or ""

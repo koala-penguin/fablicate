@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 $HOME/.claude/hooks/persistence-guard.py",
+            "command": "python3 \"$HOME/.claude/hooks/persistence-guard.py\"",
             "timeout": 15,
             "statusMessage": "Persistence guard: checking for unfinished work..."
           }

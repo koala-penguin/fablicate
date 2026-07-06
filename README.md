@@ -37,7 +37,7 @@ Idempotent: copies the hook + skill, appends the Stop-hook entry to `~/.claude/s
 
 If you are a coding agent setting this up for your user, prefer Option B non-interactively:
 1. `git clone https://github.com/koala-penguin/fablicate.git /tmp/fablicate && /tmp/fablicate/install.sh`
-2. Verify: `jq '.hooks.Stop' ~/.claude/settings.json` shows a `persistence-guard.py` entry; `~/.claude/skills/fablicate/SKILL.md` exists; `~/.claude/CLAUDE.md` contains "Autonomy & persistence".
+2. Verify: `jq '.hooks.Stop' ~/.claude/settings.json` (or `python3 -c "import json;print(json.load(open('$HOME/.claude/settings.json'))['hooks']['Stop'])"`) shows a `persistence-guard.py` entry; `~/.claude/skills/fablicate/SKILL.md` exists; `~/.claude/CLAUDE.md` contains "Autonomy & persistence".
 3. Tell your user it takes effect on the next session, and that `CLAUDE_PERSIST=0` disables the guard for any headless/scheduled jobs they run — check whether they have such jobs and gate them.
 
 Invoke marathon mode with `/fablicate <task>`. Turn off with `fablicate off`.
